@@ -1,0 +1,71 @@
+[
+  {
+    "file": "test/fixtures/edge-cases/arrows.ts",
+    "language": "typescript",
+    "requiresTask": "Task 1 — Fix arrow-function text span",
+    "description": "Verifies that arrow-function chunk.text does NOT include the leading 'const <symbol> =' declaration. After the fix, text should be only the arrow expression itself.",
+    "expectedChunks": [
+      {
+        "symbol": "addNumbers",
+        "chunk_type": "function",
+        "textMustContain": ["=>", "a + b"],
+        "textMustNotContain": ["const addNumbers"]
+      },
+      {
+        "symbol": "formatDate",
+        "chunk_type": "function",
+        "textMustContain": ["=>", "toISOString"],
+        "textMustNotContain": ["const formatDate"]
+      },
+      {
+        "symbol": "processItems",
+        "chunk_type": "function",
+        "textMustContain": ["=>", "items.map"],
+        "textMustNotContain": ["const processItems"]
+      },
+      {
+        "symbol": "createHandler",
+        "chunk_type": "function",
+        "textMustContain": ["async", "=>", "id"],
+        "textMustNotContain": ["const createHandler"]
+      }
+    ]
+  },
+  {
+    "file": "test/fixtures/edge-cases/class-methods.py",
+    "language": "python",
+    "requiresTask": "Task 3 — Multi-language chunker",
+    "description": "Verifies that Python top-level functions are 'function' type and class methods are 'method' type. The class itself should be 'class' type.",
+    "expectedChunks": [
+      {
+        "symbol": "standalone_helper",
+        "chunk_type": "function",
+        "textMustContain": ["strip", "lower"]
+      },
+      {
+        "symbol": "EventEmitter",
+        "chunk_type": "class",
+        "textMustContain": ["_listeners"]
+      },
+      {
+        "symbol": "on",
+        "chunk_type": "method",
+        "textMustContain": ["event", "callback", "_listeners"]
+      },
+      {
+        "symbol": "emit",
+        "chunk_type": "method",
+        "textMustContain": ["event", "_listeners"]
+      },
+      {
+        "symbol": "off",
+        "chunk_type": "method",
+        "textMustContain": ["event", "pop"]
+      }
+    ],
+    "notExpected": [
+      "__init__"
+    ],
+    "notExpectedNote": "Dunder methods are excluded from chunking; they are infrastructure, not semantic units."
+  }
+]

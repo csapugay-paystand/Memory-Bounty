@@ -14,3 +14,8 @@ index_name = "memory-bounty-index"
 binding = "DB"
 database_name = "memory-bounty-db"
 database_id = "ec69d71f-fb55-425e-9c77-7fee91a62ea3"
+migrations_dir = "../migrations"
+
+[[r2_buckets]]
+binding = "CHUNKS_BUCKET"
+bucket_name = "memory-bounty-chunks"

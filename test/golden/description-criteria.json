@@ -1,0 +1,156 @@
+{
+  "_comment": "Quality criteria for LLM-generated descriptions. Each entry defines what a GOOD description must look like for semantic search to work. These are evaluated against the Worker's /ingest response. Descriptions are non-deterministic, so we use keyword presence and anti-pattern checks rather than exact matching.",
+
+  "badPhrases": [
+    "This function",
+    "The function",
+    "This code",
+    "The code",
+    "Here is a description",
+    "Here is a",
+    "This is a function",
+    "This is a method",
+    "This class"
+  ],
+
+  "chunks": {
+    "hashPassword": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "password security, hashing, authentication",
+      "minLength": 60,
+      "mustContainAny": ["password", "hash", "salt", "hmac", "security", "credential", "encrypt"]
+    },
+    "verifyPassword": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "password verification, authentication",
+      "minLength": 60,
+      "mustContainAny": ["password", "verify", "compare", "check", "authentication", "hash", "credential"]
+    },
+    "generateToken": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "token generation, session management, authentication",
+      "minLength": 60,
+      "mustContainAny": ["token", "session", "generate", "sign", "jwt", "authentication", "expir"]
+    },
+    "validateToken": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "token validation, session verification",
+      "minLength": 60,
+      "mustContainAny": ["token", "validate", "verify", "expir", "parse", "authentication", "invalid"]
+    },
+    "AuthService": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "authentication service, session management",
+      "minLength": 60,
+      "mustContainAny": ["auth", "session", "login", "token", "user", "manage"]
+    },
+    "login": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "user login, authentication",
+      "minLength": 50,
+      "mustContainAny": ["login", "authenticate", "credential", "password", "session", "token"]
+    },
+    "logout": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "user logout, session termination",
+      "minLength": 40,
+      "mustContainAny": ["logout", "session", "remove", "invalidate", "clear", "end", "terminat"]
+    },
+    "refreshToken": {
+      "fixture": "mini-api/src/auth.ts",
+      "domain": "token refresh, session extension",
+      "minLength": 50,
+      "mustContainAny": ["refresh", "token", "renew", "extend", "session", "reissue"]
+    },
+    "handleGetUser": {
+      "fixture": "mini-api/src/handlers.ts",
+      "domain": "HTTP GET user endpoint, route handler",
+      "minLength": 50,
+      "mustContainAny": ["get", "user", "retrieve", "fetch", "endpoint", "route", "handler", "request"]
+    },
+    "handleCreateUser": {
+      "fixture": "mini-api/src/handlers.ts",
+      "domain": "HTTP POST create user endpoint",
+      "minLength": 50,
+      "mustContainAny": ["create", "user", "post", "endpoint", "route", "handler", "new", "register"]
+    },
+    "handleDeleteUser": {
+      "fixture": "mini-api/src/handlers.ts",
+      "domain": "HTTP DELETE user endpoint",
+      "minLength": 40,
+      "mustContainAny": ["delete", "remove", "user", "endpoint", "route", "handler"]
+    },
+    "applyMiddleware": {
+      "fixture": "mini-api/src/handlers.ts",
+      "domain": "Express middleware, request logging",
+      "minLength": 50,
+      "mustContainAny": ["middleware", "logging", "log", "request", "express", "app"]
+    },
+    "format_response": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "API response formatting, response envelope",
+      "minLength": 50,
+      "mustContainAny": ["response", "format", "api", "envelope", "status", "wrap"]
+    },
+    "validate_email": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "email validation, regex",
+      "minLength": 40,
+      "mustContainAny": ["email", "validate", "format", "regex", "pattern", "check"]
+    },
+    "parse_pagination": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "pagination, query parameters",
+      "minLength": 50,
+      "mustContainAny": ["pagina", "page", "limit", "query", "param", "offset"]
+    },
+    "CacheManager": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "in-memory cache, key-value store",
+      "minLength": 50,
+      "mustContainAny": ["cache", "store", "memory", "key", "value", "lookup"]
+    },
+    "get": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "cache lookup, key retrieval",
+      "minLength": 40,
+      "mustContainAny": ["cache", "get", "retrieve", "lookup", "key", "value"]
+    },
+    "set": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "cache write, key-value storage",
+      "minLength": 40,
+      "mustContainAny": ["cache", "set", "store", "write", "key", "value"]
+    },
+    "invalidate": {
+      "fixture": "mini-api/lib/utils.py",
+      "domain": "cache invalidation, cache eviction",
+      "minLength": 40,
+      "mustContainAny": ["cache", "invalidate", "evict", "remove", "delete", "key"]
+    },
+    "NewServer": {
+      "fixture": "mini-api/pkg/server.go",
+      "domain": "HTTP server creation, server initialization",
+      "minLength": 50,
+      "mustContainAny": ["server", "create", "http", "port", "initialize", "new"]
+    },
+    "Start": {
+      "fixture": "mini-api/pkg/server.go",
+      "domain": "HTTP server start, listen for connections",
+      "minLength": 50,
+      "mustContainAny": ["server", "start", "listen", "http", "run", "serve", "context"]
+    },
+    "RegisterRoute": {
+      "fixture": "mini-api/pkg/server.go",
+      "domain": "route registration, HTTP handler wiring",
+      "minLength": 50,
+      "mustContainAny": ["route", "register", "handler", "http", "method", "path", "endpoint"]
+    },
+    "healthCheck": {
+      "fixture": "mini-api/pkg/server.go",
+      "domain": "health check endpoint, liveness probe",
+      "minLength": 40,
+      "mustContainAny": ["health", "check", "alive", "status", "ok", "probe", "liveness"]
+    }
+  }
+}

@@ -1,0 +1,145 @@
+[
+  {
+    "file": "test/fixtures/mini-api/src/auth.ts",
+    "language": "typescript",
+    "requiresTask": null,
+    "expectedChunks": [
+      {
+        "symbol": "hashPassword",
+        "chunk_type": "function",
+        "textMustContain": ["createHmac", "salt", "password"]
+      },
+      {
+        "symbol": "verifyPassword",
+        "chunk_type": "function",
+        "textMustContain": ["timingSafeEqual", "stored", "password"]
+      },
+      {
+        "symbol": "generateToken",
+        "chunk_type": "function",
+        "textMustContain": ["payload", "userId", "signature"]
+      },
+      {
+        "symbol": "validateToken",
+        "chunk_type": "function",
+        "textMustContain": ["base64", "split", "userId"]
+      },
+      {
+        "symbol": "AuthService",
+        "chunk_type": "class",
+        "textMustContain": ["activeSessions"]
+      },
+      {
+        "symbol": "login",
+        "chunk_type": "method",
+        "textMustContain": ["verifyPassword", "generateToken"]
+      },
+      {
+        "symbol": "logout",
+        "chunk_type": "method",
+        "textMustContain": ["activeSessions", "delete"]
+      },
+      {
+        "symbol": "refreshToken",
+        "chunk_type": "method",
+        "textMustContain": ["activeSessions", "generateToken"]
+      }
+    ]
+  },
+  {
+    "file": "test/fixtures/mini-api/src/handlers.ts",
+    "language": "typescript",
+    "requiresTask": null,
+    "expectedChunks": [
+      {
+        "symbol": "handleGetUser",
+        "chunk_type": "function",
+        "textMustContain": ["json", "id"]
+      },
+      {
+        "symbol": "handleCreateUser",
+        "chunk_type": "function",
+        "textMustContain": ["201", "name"]
+      },
+      {
+        "symbol": "handleDeleteUser",
+        "chunk_type": "function",
+        "textMustContain": ["204"]
+      },
+      {
+        "symbol": "applyMiddleware",
+        "chunk_type": "function",
+        "textMustContain": ["app", "use"]
+      }
+    ]
+  },
+  {
+    "file": "test/fixtures/mini-api/lib/utils.py",
+    "language": "python",
+    "requiresTask": "Task 3 — Multi-language chunker",
+    "expectedChunks": [
+      {
+        "symbol": "format_response",
+        "chunk_type": "function",
+        "textMustContain": ["status", "ok"]
+      },
+      {
+        "symbol": "validate_email",
+        "chunk_type": "function",
+        "textMustContain": ["pattern", "re.match"]
+      },
+      {
+        "symbol": "parse_pagination",
+        "chunk_type": "function",
+        "textMustContain": ["page", "limit"]
+      },
+      {
+        "symbol": "CacheManager",
+        "chunk_type": "class",
+        "textMustContain": ["_store"]
+      },
+      {
+        "symbol": "get",
+        "chunk_type": "method",
+        "textMustContain": ["_store.get", "key"]
+      },
+      {
+        "symbol": "set",
+        "chunk_type": "method",
+        "textMustContain": ["_store", "key", "value"]
+      },
+      {
+        "symbol": "invalidate",
+        "chunk_type": "method",
+        "textMustContain": ["_store", "del"]
+      }
+    ]
+  },
+  {
+    "file": "test/fixtures/mini-api/pkg/server.go",
+    "language": "go",
+    "requiresTask": "Task 3 — Multi-language chunker",
+    "expectedChunks": [
+      {
+        "symbol": "NewServer",
+        "chunk_type": "function",
+        "textMustContain": ["http.NewServeMux", "port"]
+      },
+      {
+        "symbol": "Start",
+        "chunk_type": "method",
+        "textMustContain": ["ListenAndServe", "ctx"]
+      },
+      {
+        "symbol": "RegisterRoute",
+        "chunk_type": "method",
+        "textMustContain": ["HandleFunc", "method"]
+      },
+      {
+        "symbol": "healthCheck",
+        "chunk_type": "function",
+        "textMustContain": ["StatusOK", "ok"]
+      }
+    ]
+  }
+]
