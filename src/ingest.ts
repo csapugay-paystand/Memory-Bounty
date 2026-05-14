@@ -1,6 +1,4 @@
-import { Agent, CursorAgentError } from "@cursor/sdk";
 import { chunkFile } from "./chunker.js";
-import type { Chunk } from "./types.js";
 
 interface ChunkResult {
   symbol: string;
@@ -14,36 +12,6 @@ interface IngestResponse {
   success: boolean;
   processed: number;
   results: ChunkResult[];
-}
-
-const DESCRIPTION_PROMPT = (chunk: Chunk) =>
-  `You are building a searchable memory layer for a codebase. Write 2-3 sentences describing the following code chunk so a developer can find it through semantic search. Focus on: what this code does, why it exists, and what concepts or keywords someone would search to find it. Write from the perspective of a searcher, not a reader. Do not narrate line by line. Respond with only the description — no preamble, no code fences.
-
-Symbol: ${chunk.symbol} (${chunk.chunk_type})
-File: ${chunk.file_path}
-
-Code:
-${chunk.text}`;
-
-async function writeDescription(chunk: Chunk, apiKey: string): Promise<string> {
-  try {
-    const result = await Agent.prompt(DESCRIPTION_PROMPT(chunk), {
-      apiKey,
-      model: { id: "composer-2" },
-      local: { cwd: process.cwd() },
-    });
-
-    if (result.status !== "finished" || !result.result?.trim()) {
-      return `${chunk.chunk_type} ${chunk.symbol} in ${chunk.file_path}`;
-    }
-
-    return result.result.trim();
-  } catch (err) {
-    if (err instanceof CursorAgentError) {
-      throw new Error(`Cursor SDK error: ${err.message} (retryable=${err.isRetryable})`);
-    }
-    throw err;
-  }
 }
 
 async function main() {
@@ -62,14 +30,7 @@ async function main() {
     process.exit(1);
   }
 
-  const cursorApiKey = process.env["CURSOR_API_KEY"];
-  if (!cursorApiKey) {
-    console.error("Error: CURSOR_API_KEY environment variable is not set.");
-    console.error("Get your API key from https://cursor.com/dashboard/cloud-agents");
-    process.exit(1);
-  }
-
-  let chunks: Chunk[];
+  let chunks;
   try {
     chunks = await chunkFile(filePath);
   } catch (err) {
@@ -92,29 +53,14 @@ async function main() {
     .join(", ");
 
   console.log(`→ chunked ${chunks.length} symbols (${breakdown})`);
-  console.log(`→ writing descriptions via Cursor SDK...`);
-
-  const enrichedChunks: Chunk[] = [];
-  for (const chunk of chunks) {
-    process.stdout.write(`  ${chunk.symbol.padEnd(30)}`);
-    try {
-      const description = await writeDescription(chunk, cursorApiKey);
-      enrichedChunks.push({ ...chunk, description });
-      process.stdout.write(`✓\n`);
-    } catch (err) {
-      process.stdout.write(`✗ ${err instanceof Error ? err.message : String(err)}\n`);
-      enrichedChunks.push({ ...chunk, description: `${chunk.chunk_type} ${chunk.symbol} in ${chunk.file_path}` });
-    }
-  }
-
-  console.log(`→ descriptions written`);
+  console.log(`→ sending to Worker for description + embedding...`);
 
   let data: IngestResponse;
   try {
     const response = await fetch(`${workerUrl}/ingest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chunks: enrichedChunks }),
+      body: JSON.stringify({ chunks }),
     });
 
     if (!response.ok) {

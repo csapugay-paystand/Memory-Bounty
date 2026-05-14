@@ -37,11 +37,38 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-async function processChunk(chunk: Chunk, env: Env): Promise<ChunkResult> {
-  const description = chunk.description?.trim()
-    || `${chunk.chunk_type} ${chunk.symbol} in ${chunk.file_path}`;
+function descriptionPrompt(chunk: Chunk): string {
+  return `You are building a searchable memory layer for a codebase. Write 2-3 sentences describing the following code chunk so a developer can find it through semantic search. Focus on: what this code does, why it exists, and what concepts or keywords someone would search to find it. Write from the perspective of a searcher, not a reader. Do not narrate line by line. Respond with only the description — no preamble, no code fences.
+
+Symbol: ${chunk.symbol} (${chunk.chunk_type})
+File: ${chunk.file_path}
+
+Code:
+${chunk.text}`;
+}
+
+async function generateDescription(chunk: Chunk, env: Env): Promise<string> {
+  const fallback = `${chunk.chunk_type} ${chunk.symbol} in ${chunk.file_path}`;
 
   try {
+    const response = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+      messages: [
+        { role: "user", content: descriptionPrompt(chunk) },
+      ],
+      max_tokens: 256,
+    }) as { response?: string };
+
+    const text = response.response?.trim();
+    return text || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function processChunk(chunk: Chunk, env: Env): Promise<ChunkResult> {
+  try {
+    const description = await generateDescription(chunk, env);
+
     const embedOutput = await env.AI.run("@cf/baai/bge-small-en-v1.5", {
       text: [description],
     }) as { data: number[][] };
@@ -66,7 +93,7 @@ async function processChunk(chunk: Chunk, env: Env): Promise<ChunkResult> {
     return { symbol: chunk.symbol, hash: chunk.hash, description, ok: true };
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
-    return { symbol: chunk.symbol, hash: chunk.hash, description, ok: false, error };
+    return { symbol: chunk.symbol, hash: chunk.hash, description: "", ok: false, error };
   }
 }
 

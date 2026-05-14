@@ -7,9 +7,9 @@
 
 ## Current Phase
 
-**Phase 1 — Base Implementation: COMPLETE**
+**Phase 1 — Base Implementation: COMPLETE (revised)**
 
-The end-to-end proof-of-concept is built and functional. One file in, memory out. All four architectural layers are exercised.
+The end-to-end proof-of-concept is built and functional. One file in, memory out. All four architectural layers are exercised. Description generation has been moved from the CLI (Cursor SDK) into the Worker (Workers AI), aligning with the original plan.
 
 ---
 
@@ -21,20 +21,20 @@ The end-to-end proof-of-concept is built and functional. One file in, memory out
 - [x] **`src/types.ts`** — `Chunk` interface (`symbol`, `text`, `file_path`, `chunk_type`, `hash`, `description`)
 - [x] **`src/chunker.ts`** — Tree-sitter AST parser for TypeScript; extracts `function_declaration`, `class_declaration` + `method_definition`, named arrow `const` functions; SHA-256 hash per chunk
 - [x] **`migrations/001_init.sql`** — D1 `chunks` table schema
-- [x] **`worker/index.ts`** — Cloudflare Worker; `POST /ingest` endpoint; embeds descriptions via Workers AI (`bge-small-en-v1.5`), upserts to Vectorize, inserts to D1; CORS handling; `GET /health`
+- [x] **`worker/index.ts`** — Cloudflare Worker; `POST /ingest` endpoint; generates descriptions via Workers AI (`llama-3.1-8b-instruct`), embeds via Workers AI (`bge-small-en-v1.5`), upserts to Vectorize, inserts to D1; CORS handling; `GET /health`
 - [x] **`worker/wrangler.toml`** — Worker config with AI, Vectorize, and D1 bindings; live `database_id` populated
-- [x] **`src/ingest.ts`** — CLI entry point; chunks file → generates descriptions via `@cursor/sdk` `Agent.prompt` (model: `composer-2`) → POSTs to Worker `/ingest`
+- [x] **`src/ingest.ts`** — CLI entry point; chunks file → POSTs raw chunks to Worker `/ingest`
 - [x] **`test/`** — Chunker unit tests, mock SDK integration test, local Worker mock, example payment service fixture
 
 ---
 
-## Key Architectural Decision (Deviation from Plan)
+## Key Architectural Decision
 
-The original `implementation_plan.md` specified **Workers AI (llama-3-8b-instruct)** for description generation inside the Worker.
+Description generation runs **inside the Worker** using Workers AI (`@cf/meta/llama-3.1-8b-instruct`), consistent with the original `implementation_plan.md`. The CLI is a pure chunker + HTTP client — it does file I/O, Tree-sitter parsing, and POSTs raw chunks. All AI work (describe → embed → store) happens in the Worker.
 
-**What was actually built:** Descriptions are generated **locally on the CLI side** using `@cursor/sdk` `Agent.prompt` with `model: { id: "composer-2" }` in `src/ingest.ts`. The Worker receives pre-written descriptions and only handles embedding + storage.
+**Pipeline:** `CLI: chunk → POST raw chunks` → `Worker: describe (llama-3.1-8b) → embed (bge-small-en-v1.5) → Vectorize + D1`
 
-**Why it matters:** The Worker is now a pure "embed and persist" service. Description quality (and cost) is controlled at the CLI layer.
+No external API keys are required — description generation uses the `AI` binding bound to the Worker's Cloudflare account.
 
 ---
 
@@ -42,7 +42,7 @@ The original `implementation_plan.md` specified **Workers AI (llama-3-8b-instruc
 
 - Arrow function chunks: `buildChunk` passes the **parent `lexical_declaration` node** as the span, so `text` for arrow-function chunks includes the full `const x = () => ...` statement rather than just the arrow body.
 - `repo` column exists in D1 schema but is not populated by the current Worker insert.
-- README's "step 3" says the Worker "writes" descriptions — this is stale and reflects the original plan, not the implementation.
+- Workers AI text generation (`llama-3.1-8b-instruct`) adds latency per chunk (~1-5s each). For large files with many chunks, the Worker's wall-clock time limit may be a concern; sequential processing is the current approach.
 
 ---
 
