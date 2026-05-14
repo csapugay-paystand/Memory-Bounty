@@ -1,0 +1,15 @@
+name = "memory-bounty"
+main = "index.ts"
+compatibility_date = "2025-01-01"
+
+[ai]
+binding = "AI"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "memory-bounty-index"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "memory-bounty-db"
+database_id = "4fbaf0b1-d524-4bc5-8f19-6ccaf7a2f596"
