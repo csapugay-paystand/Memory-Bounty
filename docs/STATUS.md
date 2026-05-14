@@ -50,6 +50,7 @@ No external API keys are required — description generation uses the `AI` bindi
 
 Priority order is approximate; revisit with product context before starting.
 
+- [ ] **Model benchmarking** — systematically compare Workers AI text generation models for description quality, latency, and cost per chunk. Candidates: `llama-3.1-8b-instruct` (current), `llama-3.3-70b-instruct-fp8-fast`, `llama-3.2-3b-instruct`, `@cf/nvidia/llama-3.1-nemotron-70b-instruct-fp8-fast`. Evaluate on a fixed set of representative chunks (functions, classes, methods of varying complexity) and score descriptions on: relevance, searchability, hallucination absence, and token cost.
 - [ ] **SHA-256 deduplication** — skip re-ingesting chunks whose hash already exists in D1
 - [ ] **Multi-file ingestion** — accept a directory or glob pattern; walk all `.ts` files
 - [ ] **R2 raw source storage** — store the raw chunk `text` as a blob in R2, referenced by hash
