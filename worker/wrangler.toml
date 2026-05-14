@@ -1,6 +1,7 @@
 name = "memory-bounty"
 main = "index.ts"
 compatibility_date = "2025-01-01"
+account_id = "1189778212cecfa5d625383c359fa106"
 
 [ai]
 binding = "AI"
@@ -12,4 +13,4 @@ index_name = "memory-bounty-index"
 [[d1_databases]]
 binding = "DB"
 database_name = "memory-bounty-db"
-database_id = "4fbaf0b1-d524-4bc5-8f19-6ccaf7a2f596"
+database_id = "ec69d71f-fb55-425e-9c77-7fee91a62ea3"
