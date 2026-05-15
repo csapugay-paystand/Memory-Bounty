@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "ingest": "tsx --env-file=.env src/ingest.ts"
+    "ingest": "tsx --env-file=.env src/ingest.ts",
+    "install-hooks": "bash scripts/install-hooks.sh"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250512.0",

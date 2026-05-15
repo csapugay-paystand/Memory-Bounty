@@ -38,6 +38,16 @@ cd worker && wrangler deploy
 WORKER_URL=https://memory-bounty.<your-account>.workers.dev npx tsx src/ingest.ts ./path/to/file.ts
 ```
 
+### 6. Install git hooks (optional)
+
+Auto-ingest changed source files on every commit:
+
+```bash
+npm run install-hooks
+```
+
+This symlinks `scripts/post-commit` into `.git/hooks/`. The hook reads `WORKER_URL` from your `.env` and runs ingest in the background after each commit — your terminal returns immediately. Output is appended to `.memory-bounty.log` (gitignored).
+
 ## What it does
 
 1. Parses the target file with Tree-sitter into function/class chunks

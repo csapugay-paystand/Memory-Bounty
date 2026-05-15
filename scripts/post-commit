@@ -1,0 +1,48 @@
+#!/bin/bash
+# memory-bounty post-commit hook
+# Ingests any source files changed in the latest commit into the memory store.
+# Runs the ingest in the background so the commit completes immediately.
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# Check WORKER_URL — prefer env var already set, then fall back to .env file
+if [ -z "$WORKER_URL" ] && [ -f "$REPO_ROOT/.env" ]; then
+  WORKER_URL="$(grep -E '^WORKER_URL=' "$REPO_ROOT/.env" | tail -1 | cut -d= -f2-)"
+fi
+
+if [ -z "$WORKER_URL" ]; then
+  echo "[memory-bounty] WORKER_URL not set — skipping ingest (set it in .env)"
+  exit 0
+fi
+
+# Derive repo name from the directory name
+REPO_NAME="$(basename "$REPO_ROOT")"
+
+# Files changed in HEAD, filtered to supported source extensions, excluding test fixtures and node_modules
+CHANGED="$(git diff-tree --no-commit-id -r --name-only HEAD \
+  | grep -E '\.(ts|tsx|js|jsx|py|go)$' \
+  | grep -v 'node_modules' \
+  | grep -v '^test/fixtures/')"
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+FILE_COUNT="$(echo "$CHANGED" | wc -l | tr -d ' ')"
+echo "[memory-bounty] ingesting $FILE_COUNT changed file(s) in background..."
+
+(
+  cd "$REPO_ROOT"
+  LOG="$REPO_ROOT/.memory-bounty.log"
+  echo "--- $(date '+%Y-%m-%d %H:%M:%S') commit $(git rev-parse --short HEAD) ---" >> "$LOG"
+
+  echo "$CHANGED" | while IFS= read -r file; do
+    if [ -f "$file" ]; then
+      WORKER_URL="$WORKER_URL" npx tsx src/ingest.ts "$file" --repo "$REPO_NAME" >> "$LOG" 2>&1
+    fi
+  done
+
+  echo "[memory-bounty] done. See .memory-bounty.log for details."
+) &
+
+exit 0
