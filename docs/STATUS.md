@@ -68,7 +68,7 @@ No external API keys are required — description generation uses the `AI` bindi
 
 ---
 
-## Next Steps (Phase 2B — Not Yet Started)
+## Next Steps (Phase 2B — In Progress)
 
 Priority order is approximate; revisit with product context before starting.
 
@@ -76,9 +76,9 @@ Priority order is approximate; revisit with product context before starting.
 - [ ] **Model benchmarking** — Compare `llama-3.2-3b-instruct`, `llama-3.1-8b-instruct` (current), `llama-3.3-70b-instruct-fp8-fast` on latency/quality tradeoff
 - [ ] **KV caching** — Cache hot chunk metadata for fast lookup without D1 round-trips
 - [ ] **Durable Objects job coordination** — Track ingestion job state, progress, and failure recovery per repo
-- [ ] **Git hook integration** — Auto-trigger ingest on `git push` or `post-commit`
+- [x] **Git hook integration** — `scripts/post-commit` fires after every commit; filters changed source files; ingests in background; `scripts/install-hooks.sh` symlinks into `.git/hooks/`; `npm run install-hooks` for one-step setup
 - [ ] **Layer 2 description suite — Python/Go fixtures** — Uncomment `utils.py` and `server.go` in `description-suite.ts` once description criteria entries are verified
-- [ ] **Update README** — Document `--repo` flag, directory ingestion, supported languages
+- [ ] **Update README** — Document `--repo` flag, directory ingestion, supported languages, hook installation
 
 ---
 

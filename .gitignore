@@ -2,3 +2,4 @@ node_modules/
 dist/
 .env
 worker/.wrangler/
+.memory-bounty.log
